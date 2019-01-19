@@ -1,1 +1,4 @@
-<Say voice="alice">Water tank alarm in house 1</Say>
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Say voice="woman" language="fr-FR">Chapeau!</Say>
+</Response>
