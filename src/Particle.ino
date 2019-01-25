@@ -150,7 +150,7 @@ alarmTriggered = digitalRead(inPin);
  if (Particle.connected() == 1){
      displayLine2("Connected!");
      if(!alarmSent|| callFailed){
-     Particle.publish("twilio_sms", body, PRIVATE);
+     Particle.publish("Twilio_Call", body, PRIVATE);
      alarmSent = true;
    }
  }else{
