@@ -54,6 +54,8 @@ int alarmTriggered = 0;
  CellularSignal sig;
  bool alarmSent = false;
  bool callFailed = false;
+ String currentLine2 = "";
+ String currentSignal = ""
 void callStatus(int status);
 
 void callStatus(int Status){
@@ -80,21 +82,23 @@ void displayString(String msg){
 }
 void displayLine2(String msg){
   // draw the current demo method
+  if(currentLine2 != msg || msg ==""){
+    Serial.println("DrawLine2");
+    currentLine2 = msg;
         display.setColor(BLACK);
-        display.fillRect(0, 16, 128, 24);
+        display.fillRect(0, 16, 128, 20);
         display.display();
-
         display.setColor(WHITE);
           display.display();
         display.drawString(0, 16, msg);
           display.display();
-
+}
 }
 
 void displayBattery(){
   if ((int)fuel.getSoC() != previousBattLevel){
         display.setColor(BLACK);
-    display.fillRect(50, 0,  78, 30);
+    display.fillRect(50, 0,  78, 18);
     display.display();
     display.setColor(WHITE);
   previousBattLevel = (int)fuel.getSoC();
@@ -122,16 +126,21 @@ Particle.keepAlive(6 * 60);
 }
 
 void displaySignal(){
+
+
+  if (Particle.connected() == 1){
 CellularHelperLocationResponse locResp = CellularHelper.getLocation();
     CellularSignal sig = Cellular.RSSI();
+    CellularHelperRSSIQualResponse rssiQual = CellularHelper.getRSSIQual();
+    if(currentSignal != (String)rssiQual.rssi){
     display.setColor(BLACK);
     display.fillRect(0, 35, 128, 24);
     display.display();
     display.setColor(WHITE);
-    CellularHelperRSSIQualResponse rssiQual = CellularHelper.getRSSIQual();
     display.drawString(0, 40, (String)rssiQual.rssi);
       display.display();
-
+      currentSignal = (String)rssiQual.rssi
+}
 
   }
 
@@ -143,7 +152,6 @@ void loop() {
 displayBattery();
 displaySignal();
 alarmTriggered = digitalRead(inPin);
-    Serial.println(Particle.connected());
  if(alarmTriggered){
  digitalWrite(ledPin, HIGH);
  Particle.connect();
@@ -159,8 +167,10 @@ alarmTriggered = digitalRead(inPin);
 Serial.println("That's all!  You can restart or edit the code now.");
 }else{
    digitalWrite(ledPin, LOW);
-  Particle.disconnect();
+  if(Particle.connected() == 1) {
+    Particle.disconnect();
   Cellular.off();
+}
   displayLine2("Ready!");
 }
 }
